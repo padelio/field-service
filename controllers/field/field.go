@@ -3,12 +3,14 @@ package controllers
 import (
 	errValidation "field-service/common/error"
 	"field-service/common/response"
+	"field-service/common/util"
 	"field-service/domain/dto"
 	"field-service/services"
+	"net/http"
+
 	"github.com/gin-gonic/gin"
 	"github.com/gin-gonic/gin/binding"
 	"github.com/go-playground/validator/v10"
-	"net/http"
 )
 
 type FieldController struct {
@@ -121,9 +123,22 @@ func (f *FieldController) Create(c *gin.Context) {
 	}
 
 	validate := validator.New()
-	if err = validate.Struct(request); err != nil {
+	errUpload := util.ValidateUpload(request.Images)
+	if err = validate.Struct(request); err != nil || errUpload != nil {
 		errMessage := http.StatusText(http.StatusUnprocessableEntity)
 		errorResponse := errValidation.ErrValidationResponse(err)
+
+		if errUpload != nil {
+			errorUploadResponse := errValidation.ValidationResponse{
+				Field:   "File",
+				Message: errUpload.Error(),
+			}
+			errorResponse = append(errorResponse, errorUploadResponse)
+			if err == nil {
+				err = errUpload
+			}
+		}
+
 		response.HttpResponse(response.ParamHTTPResp{
 			Err:     err,
 			Code:    http.StatusUnprocessableEntity,
@@ -136,10 +151,12 @@ func (f *FieldController) Create(c *gin.Context) {
 
 	result, err := f.service.GetField().Create(c, &request)
 	if err != nil {
+		errMessage := err.Error()
 		response.HttpResponse(response.ParamHTTPResp{
-			Code: http.StatusBadRequest,
-			Err:  err,
-			Gin:  c,
+			Code:    http.StatusInternalServerError,
+			Err:     err,
+			Message: &errMessage,
+			Gin:     c,
 		})
 		return
 	}

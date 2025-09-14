@@ -5,7 +5,6 @@ import (
 	"context"
 	"field-service/common/gcs"
 	"field-service/common/util"
-	errConstant "field-service/constants/error"
 	"field-service/domain/dto"
 	"field-service/domain/models"
 	"field-service/repositories"
@@ -108,19 +107,6 @@ func (f *FieldService) GetByUUID(ctx context.Context, uuid string) (*dto.FieldRe
 	return &fieldResult, nil
 }
 
-func (f *FieldService) validateUpload(images []multipart.FileHeader) error {
-	if images == nil || len(images) == 0 {
-		return errConstant.ErrInvalidUploadFile
-	}
-
-	for _, image := range images {
-		if image.Size > 5*1024*1024 {
-			return errConstant.ErrSizeTooBig
-		}
-	}
-	return nil
-}
-
 func (f *FieldService) processAndUploadImage(ctx context.Context, image multipart.FileHeader) (string, error) {
 	file, err := image.Open()
 	if err != nil {
@@ -143,7 +129,7 @@ func (f *FieldService) processAndUploadImage(ctx context.Context, image multipar
 }
 
 func (f *FieldService) uploadImage(ctx context.Context, images []multipart.FileHeader) ([]string, error) {
-	err := f.validateUpload(images)
+	err := util.ValidateUpload(images)
 	if err != nil {
 		return nil, err
 	}

@@ -5,10 +5,13 @@ import (
 	"encoding/hex"
 	"fmt"
 	"math"
+	"mime/multipart"
 	"os"
 	"reflect"
 	"strconv"
 	"strings"
+
+	errConstant "field-service/constants/error"
 
 	"github.com/dustin/go-humanize"
 	"github.com/sirupsen/logrus"
@@ -165,5 +168,18 @@ func BindFromConsul(dest any, endPoint, path string) error {
 		return err
 	}
 
+	return nil
+}
+
+func ValidateUpload(images []multipart.FileHeader) error {
+	if images == nil || len(images) == 0 {
+		return errConstant.ErrInvalidUploadFile
+	}
+
+	for _, image := range images {
+		if image.Size > 2*1024*1024 {
+			return errConstant.ErrSizeTooBig
+		}
+	}
 	return nil
 }

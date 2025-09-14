@@ -9,7 +9,7 @@ var (
 	ErrUnauthorized        = errors.New("unauthorized")
 	ErrInvalidToken        = errors.New("invalid token")
 	ErrInvalidUploadFile   = errors.New("invalid upload file")
-	ErrSizeTooBig          = errors.New("size too big")
+	ErrSizeTooBig          = errors.New("size too big (1MB at max)")
 	ErrForbidden           = errors.New("forbidden")
 )
 
