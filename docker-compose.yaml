@@ -3,7 +3,7 @@ services:
   field-service:
     container_name: field-service
     platform: linux/amd64
-    image: masadamsahid/padelio-field-service:2
+    image: masadamsahid/padelio-field-service:4
     # build:
     #   context: .
     #   dockerfile: Dockerfile
