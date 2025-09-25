@@ -3,10 +3,10 @@ services:
   field-service:
     container_name: field-service
     platform: linux/amd64
-    # image: masadamsahid/padelio-field-service:1
-    build:
-      context: .
-      dockerfile: Dockerfile
+    image: masadamsahid/padelio-field-service:1
+    # build:
+    #   context: .
+    #   dockerfile: Dockerfile
     ports:
       - "8002:8002"
     env_file:
